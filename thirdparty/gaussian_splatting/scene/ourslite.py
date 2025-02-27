@@ -1110,6 +1110,7 @@ class GaussianModel:
 
 
     def densify_pruneclone(self, max_grad, min_opacity, extent, max_screen_size, splitN=1):
+        input("hit densify pruneclone... press enter to continue")
         #print("before", torch.amax(self.get_scaling))
         grads = self.xyz_gradient_accum / self.denom
         grads[grads.isnan()] = 0.0

@@ -60,6 +60,7 @@ class GaussianModel:
         self.percent_dense = 0
         self.spatial_lr_scale = 0
         self._omega = torch.empty(0)
+        self._generation = torch.empty(0)
         
         self.rgbdecoder = getcolormodel(rgbfuntion)
     
@@ -150,7 +151,8 @@ class GaussianModel:
             self.active_sh_degree += 1
 
     def create_from_pcd(self, pcd : BasicPointCloud, spatial_lr_scale : float):
-
+        while (True):
+            print("creating from pcd")
         if self.preprocesspoints == 3:
             pcd = interpolate_point(pcd, 4) 
         
@@ -302,6 +304,8 @@ class GaussianModel:
 
 
     def training_setup(self, training_args):
+        while (True):
+            print("setting up training")
         self.percent_dense = training_args.percent_dense
         self.xyz_gradient_accum = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")

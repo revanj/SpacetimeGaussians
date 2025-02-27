@@ -60,6 +60,7 @@ class GaussianModel:
         self.percent_dense = 0
         self.spatial_lr_scale = 0
         self._omega = torch.empty(0)
+        self._generation = torch.empty(0)
         
         self.rgbdecoder = getcolormodel(rgbfuntion)
     
@@ -150,7 +151,6 @@ class GaussianModel:
             self.active_sh_degree += 1
 
     def create_from_pcd(self, pcd : BasicPointCloud, spatial_lr_scale : float):
-
         if self.preprocesspoints == 3:
             pcd = interpolate_point(pcd, 4) 
         
@@ -189,6 +189,9 @@ class GaussianModel:
 
 
         print("Number of points at initialisation : ", fused_point_cloud.shape[0])
+        self._generation = torch.zeros(fused_point_cloud.shape[0], device="cuda", dtype=torch.int)
+        print(self._generation)
+        input("Created _generation array, Press Enter to continue...")
 
         dist2 = torch.clamp_min(distCUDA2(torch.from_numpy(np.asarray(pcd.points)).float().cuda()), 0.0000001)
         scales = torch.log(torch.sqrt(dist2))[...,None].repeat(1, 3)

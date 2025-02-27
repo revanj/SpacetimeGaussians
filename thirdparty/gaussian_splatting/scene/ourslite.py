@@ -942,7 +942,7 @@ class GaussianModel:
         self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
 
         new_generation += 1
-        self._generation = torch.cat(self._generation, new_generation)
+        self._generation = torch.cat((self._generation, new_generation))
 
     
 

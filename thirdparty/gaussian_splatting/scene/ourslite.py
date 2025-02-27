@@ -890,6 +890,7 @@ class GaussianModel:
         self.max_radii2D = self.max_radii2D[valid_points_mask]
         if self.omegamask is not None :
             self.omegamask = self.omegamask[valid_points_mask]
+        self._generation = self._generation[valid_points_mask]
 
     def cat_tensors_to_optimizer(self, tensors_dict):
         optimizable_tensors = {}
@@ -913,7 +914,7 @@ class GaussianModel:
 
         return optimizable_tensors
 
-    def densification_postfix(self, new_xyz, new_features_dc, new_opacities, new_scaling, new_rotation, new_trbf_center, new_trbfscale, new_motion, new_omega, dummy=None):
+    def densification_postfix(self, new_xyz, new_features_dc, new_opacities, new_scaling, new_rotation, new_trbf_center, new_trbfscale, new_motion, new_omega, dummy=None, new_generation=None):
         d = {"xyz": new_xyz,
         "f_dc": new_features_dc,
         "opacity": new_opacities,
@@ -939,6 +940,9 @@ class GaussianModel:
         self.xyz_gradient_accum = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
+
+        new_generation += 1
+        self._generation = torch.cat(self._generation, new_generation)
 
     
 
@@ -967,8 +971,9 @@ class GaussianModel:
         new_trbf_scale = self._trbf_scale[selected_pts_mask].repeat(N,1)
         new_motion = self._motion[selected_pts_mask].repeat(N,1)
         new_omega = self._omega[selected_pts_mask].repeat(N,1)
+        new_generation = self._generation[selected_pts_mask].repeat(N)
 
-        self.densification_postfix(new_xyz, new_features_dc, new_opacity, new_scaling, new_rotation, new_trbf_center, new_trbf_scale, new_motion, new_omega)
+        self.densification_postfix(new_xyz, new_features_dc, new_opacity, new_scaling, new_rotation, new_trbf_center, new_trbf_scale, new_motion, new_omega, None, new_generation)
 
         prune_filter = torch.cat((selected_pts_mask, torch.zeros(N * selected_pts_mask.sum(), device="cuda", dtype=bool)))
         self.prune_points(prune_filter)
@@ -1064,7 +1069,8 @@ class GaussianModel:
         new_trbfscale = self._trbf_scale[selected_pts_mask]
         new_motion = self._motion[selected_pts_mask]
         new_omega = self._omega[selected_pts_mask]
-        self.densification_postfix(new_xyz, new_features_dc, new_opacities, new_scaling, new_rotation, new_trbf_center, new_trbfscale, new_motion, new_omega)
+        new_generation = self._generation[selected_pts_mask]
+        self.densification_postfix(new_xyz, new_features_dc, new_opacities, new_scaling, new_rotation, new_trbf_center, new_trbfscale, new_motion, new_omega, None, new_generation)
 
 
     def densify_and_cloneim(self, grads, grad_threshold, scene_extent):
@@ -1110,7 +1116,6 @@ class GaussianModel:
 
 
     def densify_pruneclone(self, max_grad, min_opacity, extent, max_screen_size, splitN=1):
-        input("hit densify pruneclone... press enter to continue")
         #print("before", torch.amax(self.get_scaling))
         grads = self.xyz_gradient_accum / self.denom
         grads[grads.isnan()] = 0.0
@@ -1121,6 +1126,8 @@ class GaussianModel:
 
         self.densify_and_splitv2(grads, max_grad, extent, 2)
         print("after split", self._xyz.shape[0])
+
+        input("xyz length is", self._xyz.shape[0], "generation length is", len(self._generation))
 
         prune_mask = (self.get_opacity < min_opacity).squeeze()
         if max_screen_size:

@@ -1129,8 +1129,6 @@ class GaussianModel:
         self.densify_and_splitv2(grads, max_grad, extent, 2)
         print("after split", self._xyz.shape[0])
 
-        input("xyz length is {}, generation length is {}".format(self._xyz.shape[0], len(self._generation)) )
-
         prune_mask = (self.get_opacity < min_opacity).squeeze()
         if max_screen_size:
             big_points_vs = self.max_radii2D > max_screen_size  

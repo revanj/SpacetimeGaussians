@@ -942,9 +942,10 @@ class GaussianModel:
         self.xyz_gradient_accum = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
-
-        new_generation += 1
-        self._generation = torch.cat((self._generation, new_generation))
+        
+        if new_generation:
+            new_generation += 1
+            self._generation = torch.cat((self._generation, new_generation))
 
     
 

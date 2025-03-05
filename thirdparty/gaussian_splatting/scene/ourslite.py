@@ -943,7 +943,7 @@ class GaussianModel:
         self.denom = torch.zeros((self.get_xyz.shape[0], 1), device="cuda")
         self.max_radii2D = torch.zeros((self.get_xyz.shape[0]), device="cuda")
         
-        if new_generation:
+        if new_generation is not None:
             new_generation += 1
             self._generation = torch.cat((self._generation, new_generation))
 

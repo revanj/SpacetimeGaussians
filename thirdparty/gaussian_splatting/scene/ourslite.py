@@ -989,6 +989,7 @@ class GaussianModel:
     
 
     def densify_and_splitim(self, grads, grad_threshold, scene_extent, N=2):
+        input("densify_and_splitim is called!")
         n_init_points = self.get_xyz.shape[0]
         padded_grad = torch.zeros((n_init_points), device="cuda")
         padded_grad[:grads.shape[0]] = grads.squeeze()
@@ -1016,6 +1017,7 @@ class GaussianModel:
         self.prune_points(prune_filter)
 
     def densify_and_split(self, grads, grad_threshold, scene_extent, N=2):
+        input("densify_and_split is called!")
         n_init_points = self.get_xyz.shape[0]
         padded_grad = torch.zeros((n_init_points), device="cuda")
         padded_grad[:grads.shape[0]] = grads.squeeze()
@@ -1065,6 +1067,8 @@ class GaussianModel:
         torch.cuda.empty_cache()
 
     def densify_and_clone(self, grads, grad_threshold, scene_extent):
+        input("densify_and_split is called!")
+        
         # Extract points that satisfy the gradient condition
         selected_pts_mask = torch.where(torch.norm(grads, dim=-1) >= grad_threshold, True, False)
         selected_pts_mask = torch.logical_and(selected_pts_mask,
@@ -1083,6 +1087,7 @@ class GaussianModel:
 
 
     def densify_and_cloneim(self, grads, grad_threshold, scene_extent):
+        input("densify_and_cloneim is called!")
         # Extract points that satisfy the gradient condition
         selected_pts_mask = torch.where(torch.norm(grads, dim=-1) >= grad_threshold, True, False)
         selected_pts_mask = torch.logical_and(selected_pts_mask,
@@ -1149,6 +1154,7 @@ class GaussianModel:
         self.denom[update_filter] += 1
 
     def addgaussians(self, baduvidx, viewpoint_cam, depthmap, gt_image, numperay=3, ratioend=2, trbfcenter=0.5,depthmax=None,shuffle=False):
+        input("addgaussians is called!")
         def pix2ndc(v, S):
             return (v * 2.0 + 1.0) / S - 1.0
         ratiaolist = torch.linspace(self.raystart, ratioend, numperay) # 0.7 to ratiostart
@@ -1177,7 +1183,8 @@ class GaussianModel:
         new_trbf_scale = []
         new_motion = []
         new_omega = []
-        new_featuret = [ ]
+        new_featuret = []
+        new_generation = []
 
         camera2wold = viewpoint_cam.world_view_transform.T.inverse()
         projectinverse = viewpoint_cam.projection_matrix.T.inverse()

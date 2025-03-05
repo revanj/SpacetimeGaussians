@@ -974,7 +974,11 @@ class GaussianModel:
         new_trbf_scale = self._trbf_scale[selected_pts_mask].repeat(N,1)
         new_motion = self._motion[selected_pts_mask].repeat(N,1)
         new_omega = self._omega[selected_pts_mask].repeat(N,1)
+        print ("shape of omega is", self._omega.shape)
+        print("shape of the new omega is", new_omega.shape)
         new_generation = self._generation[selected_pts_mask].repeat(N)
+        print("shape of generation is", self.generation.shape)
+        print("shape of new_generation is", new_generation.shape)
 
         self.densification_postfix(new_xyz, new_features_dc, new_opacity, new_scaling, new_rotation, new_trbf_center, new_trbf_scale, new_motion, new_omega, None, new_generation)
 

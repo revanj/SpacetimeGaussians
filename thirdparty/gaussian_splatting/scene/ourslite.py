@@ -947,7 +947,9 @@ class GaussianModel:
             new_generation += 1
             self._generation = torch.cat((self._generation, new_generation))
 
-    
+        print("after densification postfix:")
+        print("shape of generation is", _generation.shape)
+        print("shape of omega is", _omega.shape)
 
     def densify_and_splitv2(self, grads, grad_threshold, scene_extent, N=2):
         n_init_points = self.get_xyz.shape[0]

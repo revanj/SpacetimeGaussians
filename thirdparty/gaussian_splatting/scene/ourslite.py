@@ -1040,13 +1040,16 @@ class GaussianModel:
         new_trbf_scale = self._trbf_scale[selected_pts_mask].repeat(N,1)
         new_motion = self._motion[selected_pts_mask].repeat(N,1)
         new_omega = self._omega[selected_pts_mask].repeat(N,1)
+        new_generation = self._generation[selected_pts_mask].repeat(N)
 
-        self.densification_postfix(new_xyz, new_features_dc, new_opacity, new_scaling, new_rotation, new_trbf_center, new_trbf_scale, new_motion, new_omega)
+
+        self.densification_postfix(new_xyz, new_features_dc, new_opacity, new_scaling, new_rotation, new_trbf_center, new_trbf_scale, new_motion, new_omega, None, new_generation)
 
         prune_filter = torch.cat((selected_pts_mask, torch.zeros(N * selected_pts_mask.sum(), device="cuda", dtype=bool)))
         self.prune_points(prune_filter)
     
     def densify_prunecloneimgeneral(self, max_grad, min_opacity, extent, max_screen_size, splitN=1):
+        input("densify_and_cloneimgeneral is called!")
         #print("before", torch.amax(self.get_scaling))
         grads = self.xyz_gradient_accum / self.denom
         grads[grads.isnan()] = 0.0
@@ -1067,7 +1070,7 @@ class GaussianModel:
         torch.cuda.empty_cache()
 
     def densify_and_clone(self, grads, grad_threshold, scene_extent):
-        input("densify_and_split is called!")
+        input("densify_and_clone is called!")
         
         # Extract points that satisfy the gradient condition
         selected_pts_mask = torch.where(torch.norm(grads, dim=-1) >= grad_threshold, True, False)
